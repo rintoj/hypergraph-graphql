@@ -2,20 +2,21 @@ import 'reflect-metadata'
 
 import { GraphQLResolverMap } from 'apollo-graphql'
 import { sync } from 'fast-glob'
-import { AuthChecker, BuildSchemaOptions } from 'type-graphql'
+import 'reflect-metadata'
+import { AuthChecker, NonEmptyArray } from 'type-graphql'
 import { GraphQLContext } from '../context/graphql-context-types'
 import { buildFederatedSchema } from '../federation/graphql-federated-schema'
 import { isInternalClass } from '../gateway/graphql-internal-decorator'
 
-export type Resolvers = Omit<BuildSchemaOptions, 'skipCheck'>
 export type ReferenceResolvers = GraphQLResolverMap<any>
 
 export interface GraphQLSchemaConfig {
-  resolvers: Resolvers
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  resolvers: NonEmptyArray<Function> | NonEmptyArray<string>
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  orphanedTypes?: Function[]
   referenceResolvers?: ReferenceResolvers
-  isLocal?: boolean
   isInternal?: boolean
-  context?: () => GraphQLContext
   authChecker?: AuthChecker<GraphQLContext>
 }
 
@@ -25,11 +26,12 @@ function isFieldResolver(classDeclaration: any) {
 
 export async function createGraphqlSchema({
   resolvers,
-  referenceResolvers,
+  orphanedTypes = [],
+  referenceResolvers = {},
+  isInternal = false,
   authChecker,
-  isInternal,
 }: GraphQLSchemaConfig) {
-  const resolverFunctions = resolvers.resolvers.flatMap(resolverPath => {
+  const resolverFunctions = resolvers.flatMap(resolverPath => {
     const files = sync(resolverPath as string)
     return files.reduce(
       (a, file) => [
@@ -45,11 +47,11 @@ export async function createGraphqlSchema({
   })
   return await buildFederatedSchema(
     {
-      ...resolvers,
       resolvers: resolverFunctions as any,
-      authChecker,
+      orphanedTypes,
       emitSchemaFile: false,
       validate: false,
+      authChecker,
     },
     referenceResolvers,
   )

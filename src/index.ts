@@ -1,3 +1,4 @@
+export * from './auth'
 export * from './context'
 export * from './federation'
 export * from './gateway'
