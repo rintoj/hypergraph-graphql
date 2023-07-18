@@ -1,17 +1,20 @@
-# hypergraph-graphql
+# Hypergraph GraphQL
+
+This package is published to handle all the graphql based implementations that can accelerate the
+app development using Hypergraph.
 
 ## Install
 
 Using npm:
 
 ```sh
-npm install hypergraph-graphql
+npm install @hgraph/graphql
 ```
 
 Using yarn:
 
 ```sh
-yarn add hypergraph-graphql
+yarn add @hgraph/graphql
 ```
 
 ## Usage
@@ -19,7 +22,7 @@ yarn add hypergraph-graphql
 Create `src/schema.ts`
 
 ```ts
-import { createGraphqlSchema } from 'hypergraph-graphql'
+import { createGraphqlSchema } from '@hgraph/graphql'
 
 export async function createSchema() {
   return await createGraphqlSchema({
@@ -33,7 +36,7 @@ Add api server `src/index.ts`
 ```ts
 import 'reflect-metadata'
 
-import { initializeGraphqlServer } from 'hypergraph-graphql'
+import { initializeGraphqlServer } from '@hgraph/graphql'
 import { bootstrapServer, createMiddleware } from 'hypergraph-server'
 import { createSchema } from './schema'
 
@@ -93,7 +96,7 @@ This will expose a new endpoint [http://localhost:4000/graphql](http://localhost
 Update `src/schema.ts` to add role based auth check
 
 ```ts
-import { createGraphqlSchema, authChecker } from 'hypergraph-graphql'
+import { createGraphqlSchema, authChecker } from '@hgraph/graphql'
 
 export async function createSchema() {
   return await createGraphqlSchema({
@@ -128,7 +131,7 @@ export class UserResolver {
 You can have your own implementation of `authChecker` with the help of the following snippet.
 
 ```ts
-import { GraphQLContext, UserRole, IdSelector } from 'hypergraph-graphql'
+import { GraphQLContext, UserRole, IdSelector } from '@hgraph/graphql'
 import { intersection } from 'lodash'
 import { AuthChecker, ResolverData } from 'type-graphql'
 
