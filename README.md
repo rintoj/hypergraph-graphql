@@ -46,7 +46,7 @@ async function run() {
   await bootstrapServer({
     port: 4000,
     apiRoot: '/api',
-    controllers: [`${__dirname}/**/*-controller.ts`],
+    controllers: [`${__dirname}/**/*-controller.{ts,js}`],
     middlewares: [createMiddleware(router)],
   })
 }
@@ -100,7 +100,7 @@ import { createGraphqlSchema, authChecker } from '@hgraph/graphql'
 
 export async function createSchema() {
   return await createGraphqlSchema({
-    resolvers: [`${__dirname}/**/*-resolver.ts`],
+    resolvers: [`${__dirname}/**/*-resolver.{ts,js}`],
     authChecker,
   })
 }

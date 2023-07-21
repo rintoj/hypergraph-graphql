@@ -47,7 +47,8 @@ export async function createGraphqlSchema({
   })
   return await buildFederatedSchema(
     {
-      resolvers: resolverFunctions as any,
+      // to avoid getting an error if the number of resolvers are empty
+      resolvers: !resolverFunctions.length ? [() => null] : (resolverFunctions as any),
       orphanedTypes,
       emitSchemaFile: false,
       validate: false,

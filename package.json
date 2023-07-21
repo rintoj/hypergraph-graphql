@@ -13,8 +13,7 @@
     "test": "jest",
     "lint": "eslint --fix && tsc -p . --noEmit && yarn prettier",
     "prettier": "prettier --write \"**/src/**/*.{ts,tsx}\" -c",
-    "build": "rimraf dist && tsc -p .",
-    "semantic-release": "semantic-release"
+    "build": "rimraf dist && tsc -p ."
   },
   "license": "MIT",
   "private": false,
