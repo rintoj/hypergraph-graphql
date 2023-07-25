@@ -37,7 +37,7 @@ Add api server `src/index.ts`
 import 'reflect-metadata'
 
 import { initializeGraphqlServer } from '@hgraph/graphql'
-import { bootstrapServer, createMiddleware } from 'hypergraph-server'
+import { bootstrapServer, createMiddleware } from '@hgraph/server'
 import { createSchema } from './schema'
 
 async function run() {
