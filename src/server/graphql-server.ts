@@ -10,12 +10,14 @@ import graphqlRequestLogger from '../util/graphql-request-logger'
 export interface GraphQLServerConfig {
   schema: GraphQLSchema
   isLocal?: boolean
+  apiRoot?: string
   context?: (props: { req: Request }) => Promise<GraphQLContext>
 }
 
 export function initializeGraphqlServer({
   schema,
   context = serviceContext,
+  apiRoot = '/graphql',
   isLocal = false,
 }: GraphQLServerConfig) {
   const server = new ApolloServer({
@@ -27,7 +29,7 @@ export function initializeGraphqlServer({
     plugins: [isLocal ? graphqlRequestLogger : {}],
   })
   return server.getMiddleware({
-    path: process.env.SERVICE_NAME ? `/${process.env.SERVICE_NAME}/graphql` : undefined,
+    path: apiRoot,
     bodyParserConfig: {
       limit: '100mb',
     },
