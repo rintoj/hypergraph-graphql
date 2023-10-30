@@ -22,8 +22,9 @@ jobs:
         with:
           node-version: '18.18.2'
       - run: npm install
-      - run: npm install semantic-release
       - run: npm run build
+      - run: npm install semantic-release
+      - run: git stash -k -u && git stash drop
       - run: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
