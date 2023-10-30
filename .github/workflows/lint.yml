@@ -21,7 +21,6 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npm run build
-      - run: npm run release --version
       - name: Commit code changes if any
         uses: EndBug/add-and-commit@v7
         with:
@@ -29,3 +28,5 @@ jobs:
           author_email: bot+github-actions-gm@users.noreply.github.com
           message: 'Fix code style issues with eslint & prettier, update schema and hooks'
           push: '--set-upstream origin'
+      - run: npm install semantic-release
+      - run: npm run release --version
