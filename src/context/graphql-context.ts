@@ -1,4 +1,5 @@
 import { Request } from 'express'
+import { ById } from 'tsds-tools'
 import { container } from 'tsyringe'
 import { GraphQLContext, UserRole } from './graphql-context-types'
 import { INTERNAL_AUTH_TOKEN } from './graphql-internal-token'
@@ -28,38 +29,44 @@ export interface TokenVerifier {
   }>
 }
 
-export function createGQLContext(verifyToken: TokenVerifier) {
+export interface RepositoryResolver {
+  (context: GraphQLContext): ById<any>
+}
+
+export function createGQLContext(
+  verifyToken?: TokenVerifier,
+  createRepoResolver?: RepositoryResolver,
+) {
   return async function graphQLContext({ req }: { req: Request }): Promise<GraphQLContext> {
     const authorization = req?.headers?.authorization
     const internalAuthToken = req?.headers?.[`x-auth-token`] as string | undefined
-
+    const context: GraphQLContext = { container: container.createChildContainer(), req }
+    context.repositories = createRepoResolver?.(context)
     if (internalAuthToken && internalAuthToken === INTERNAL_AUTH_TOKEN) {
       return {
+        ...context,
         userId: 'SYSTEM',
         userRoles: [UserRole.INTERNAL],
-        container: container.createChildContainer(),
-        req,
       }
     }
 
-    if (authorization) {
+    if (authorization && verifyToken) {
       try {
         const token = authorization.replace(/Bearer /i, '')
         const decoded = await verifyToken(token)
         if (!decoded) throw new Error('Invalid bearer token!')
         return {
+          ...context,
           token,
           providerUserId: decoded.providerUserId,
           userId: decoded.userId,
           userRoles: decoded.userRoles,
-          container: container.createChildContainer(),
-          req,
         }
       } catch (e) {
         console.warn('Invalid authorization token!', e)
       }
     }
-    return { container: container.createChildContainer(), req }
+    return context
   }
 }
 

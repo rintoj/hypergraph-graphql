@@ -1,4 +1,5 @@
 import { Request } from 'express'
+import { ById } from 'tsds-tools'
 import { DependencyContainer } from 'tsyringe'
 
 export enum UserRole {
@@ -14,5 +15,6 @@ export interface GraphQLContext {
   userRoles?: UserRole[]
   token?: string
   container: DependencyContainer
+  repositories?: ById<any>
   req?: Request
 }
