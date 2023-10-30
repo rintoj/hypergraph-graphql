@@ -29,7 +29,6 @@
     "jest": "29.0.3",
     "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13",
-    "semantic-release": "^22.0.5",
     "ts-jest": "29.0.0",
     "tsds-tools": "^1.0.6",
     "tsyringe": "^4.7.0",
