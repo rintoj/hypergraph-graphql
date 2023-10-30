@@ -23,7 +23,7 @@ jobs:
           node-version: '18.18.2'
       - run: npm install
       - run: npm run build
-      - run: npm run semantic-release
+      - run: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
