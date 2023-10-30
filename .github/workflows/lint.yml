@@ -17,11 +17,10 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v1
         with:
-          node-version: '14.x'
-      - run: yarn --pure-lockfile
-      - run: yarn run lint
-      - run: yarn run test
-      - run: yarn run build
+          node-version: '18.18.2'
+      - run: npm install
+      - run: npm run lint
+      - run: npm run build
       - name: Commit code changes if any
         uses: EndBug/add-and-commit@v7
         with:

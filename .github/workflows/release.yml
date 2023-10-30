@@ -20,10 +20,10 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v1
         with:
-          node-version: '14.x'
-      - run: yarn --pure-lockfile
-      - run: yarn run build
-      - run: yarn run semantic-release
+          node-version: '18.18.2'
+      - run: npm install
+      - run: npm run build
+      - run: npm run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
