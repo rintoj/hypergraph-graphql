@@ -16,7 +16,7 @@ export interface GraphQLServerConfig {
 
 export function initializeGraphqlServer({
   schema,
-  context = serviceContext,
+  context = async (props: { req: Request }) => serviceContext(props),
   apiRoot = '/graphql',
   isLocal = false,
 }: GraphQLServerConfig) {
