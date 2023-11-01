@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import { ById } from 'tsds-tools'
 import { DependencyContainer } from 'tsyringe'
+import { PaginationInput } from '../gql-types'
 
 export enum UserRole {
   USER = 'USER',
@@ -16,5 +17,7 @@ export interface GraphQLContext {
   token?: string
   container: DependencyContainer
   repositories?: ById<any>
+  pagination?: PaginationInput
+  withPagination: (pagination?: PaginationInput) => GraphQLContext
   req?: Request
 }

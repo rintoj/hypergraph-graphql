@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql'
-import { subscriberContext } from '../context/graphql-context'
+import { createContext } from '../context/graphql-context'
 import { GraphQLContext } from '../context/graphql-context-types'
 import { resolveGatewayService } from '../gateway/graphql-gateway-service'
 
@@ -24,6 +24,6 @@ export async function useQuery<QueryType, RequestType>(
   }
   return (await gatewayService.runGraphQLQuery(
     { query: source, variables: options?.variables },
-    options?.context ?? subscriberContext(),
+    options?.context ?? createContext(),
   )) as QueryType
 }
