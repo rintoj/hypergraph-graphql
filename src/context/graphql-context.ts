@@ -1,9 +1,9 @@
 import { Request } from 'express'
+import { toCamelCase } from 'name-util'
 import { ById } from 'tsds-tools'
 import { container } from 'tsyringe'
 import { PaginationInput } from '../gql-types'
 import { GraphQLContext, UserRole } from './graphql-context-types'
-import { INTERNAL_AUTH_TOKEN } from './graphql-internal-token'
 
 function toBase64(object: any) {
   const str = JSON.stringify(object)
@@ -50,22 +50,16 @@ export function createGQLContext(
 ) {
   return async function graphQLContext({ req }: { req: Request }): Promise<GraphQLContext> {
     const authorization = req?.headers?.authorization
-    const internalAuthToken = req?.headers?.[`x-auth-token`] as string | undefined
-    const context: GraphQLContext = createContext(req)
+    const data = Object.keys(req?.headers ?? {})
+      .filter(key => /^x-/.test(key))
+      .reduce((a, key) => ({ ...a, [toCamelCase(key.replace(/^x-/, ''))]: req.headers[key] }), {})
+    const context: GraphQLContext = { ...createContext(req), ...data }
     context.repositories = createRepoResolver?.(context)
-    if (internalAuthToken && internalAuthToken === INTERNAL_AUTH_TOKEN) {
-      return {
-        ...context,
-        userId: 'SYSTEM',
-        userRoles: [UserRole.INTERNAL],
-      }
-    }
-
     if (authorization && verifyToken) {
       try {
         const token = authorization.replace(/Bearer /i, '')
         const decoded = await verifyToken(token)
-        if (!decoded) throw new Error('Invalid bearer token!')
+        if (!decoded) return context
         return {
           ...context,
           token,
