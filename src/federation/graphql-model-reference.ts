@@ -6,10 +6,10 @@ export interface EntityReference {
 }
 
 export function createEntityReference(
-  type: ClassType,
+  type: ClassType | string,
   id: string | undefined | null,
 ): EntityReference | undefined {
   if (id) {
-    return { __typename: type.name, id }
+    return { __typename: typeof type === 'string' ? type : type.name, id }
   }
 }

@@ -143,3 +143,57 @@ export const authChecker: AuthChecker<GraphQLContext> = async (
   throw new Error('Unauthorized')
 }
 ```
+
+## Sharable Type
+
+Step 1: Configure the service to enable resolution of user references. Utilize the provided code
+snippet to achieve this setup.
+
+```tsx
+// user-service/src/schema/user/user-schema.ts
+import { ShareableType } from '@hgraph/graphql'
+import { Field, ID } from 'type-graphql'
+
+@ShareableType('User')
+export class UserSchema {
+  @Field(() => ID)
+  id!: string
+
+  @Field({ nullable: true })
+  name?: string
+}
+
+// user-service/src/schema.ts
+import { createGraphqlSchema, referenceResolver } from '@hgraph/graphql'
+import { UserRepository } from './schema/user/user-repository'
+
+export async function createSchema() {
+  return await createGraphqlSchema({
+    resolvers: [`${__dirname}/**/*-resolver.ts`],
+    referenceResolvers: {
+      User: referenceResolver(UserRepository), // ← ADD THIS
+    },
+  })
+}
+```
+
+Step 2: In the other service, use `createEntityReference` to instruct the user service to resolve a
+user by its ID.
+
+```tsx
+// src/query/collaborators-query-resolver.ts
+import { createEntityReference } from '@hgraph/graphql'
+
+@Resolver()
+export class CollaboratorsQueryResolver {
+  @Authorized()
+  @Query(() => [UserSchema])
+  async collaborators(@Ctx() context: GraphQLContext, @Arg('projectId') projectId: string) {
+    const collaborators = await collaboratorRepository.findAll(query =>
+      query.whereEqualTo('projectId', projectId),
+    )
+    // ADD THIS LINE
+    return collaborators.map(collaborator => createEntityReference('User', collaborator.userId))
+  }
+}
+```
