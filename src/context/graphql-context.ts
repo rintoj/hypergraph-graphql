@@ -4,6 +4,7 @@ import { ById } from 'tsds-tools'
 import { container } from 'tsyringe'
 import { PaginationInput } from '../gql-types'
 import { GraphQLContext, UserRole } from './graphql-context-types'
+import { splitCookiesString, parse } from 'set-cookie-parser'
 
 function toBase64(object: any) {
   const str = JSON.stringify(object)
@@ -44,20 +45,31 @@ export function createContext(req?: Request) {
   }
 }
 
+function resolveToken(req: Request) {
+  // read from authorization header
+  const authorization = req?.headers?.authorization
+  const token = authorization?.replace(/Bearer /i, '')
+  if (token) return token
+
+  // read from cookie
+  const splitCookieHeaders = splitCookiesString(req?.headers?.cookie)
+  const cookies: any = parse(splitCookieHeaders, { decodeValues: true, map: true })
+  return cookies?.accessToken?.value
+}
+
 export function createGQLContext(
   verifyToken?: TokenVerifier,
   createRepoResolver?: RepositoryResolver,
 ) {
   return async function graphQLContext({ req }: { req: Request }): Promise<GraphQLContext> {
-    const authorization = req?.headers?.authorization
+    const token = resolveToken(req)
     const data = Object.keys(req?.headers ?? {})
       .filter(key => /^x-/.test(key))
       .reduce((a, key) => ({ ...a, [toCamelCase(key.replace(/^x-/, ''))]: req.headers[key] }), {})
     const context: GraphQLContext = { ...createContext(req), ...data }
     context.repositories = createRepoResolver?.(context)
-    if (authorization && verifyToken) {
+    if (token && verifyToken) {
       try {
-        const token = authorization.replace(/Bearer /i, '')
         const decoded = await verifyToken(token)
         if (!decoded) return context
         return {
