@@ -40,6 +40,7 @@
     "@types/jest": "^29.0.1",
     "@types/lodash": "^4.14.195",
     "@types/node": "^18.7.16",
+    "@types/set-cookie-parser": "^2.4.7",
     "@typescript-eslint/eslint-plugin": "^5.36.2",
     "@typescript-eslint/parser": "^5.36.2",
     "eslint": "^8.23.0",
